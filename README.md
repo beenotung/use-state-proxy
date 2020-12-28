@@ -25,6 +25,8 @@ export function useStateProxy<T extends object>(initialValues: T): StateProxy<T>
 ## Examples
 
 ### With use-state-proxy
+You can get/set the values directly.
+The set state action is auto dispatched if the value is changed, which auto trigger re-rendering when needed.
 ```typescript jsx
 import React from 'react';
 import { useStateProxy } from 'use-state-proxy';
@@ -51,6 +53,7 @@ function Num({ state, name }) {
 ```
 
 ### Without use-state-proxy
+You need to explicitly call the setHook to dispatch update action to trigger re-rendering.
 ```typescript jsx
 import React from 'react';
 
