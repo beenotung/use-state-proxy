@@ -1,23 +1,18 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import { useStateProxy } from './use-state-proxy';
+import { Calculator } from './Calculator';
+import { State } from './state';
 
 function App() {
+  let state = useStateProxy<State>({ a: 2, b: 3, sum: 5 });
+  state.sum = state.a + state.b;
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <Calculator state={state} name={'a'} />
+        <Calculator state={state} name={'b'} />
+        <Calculator state={state} name={'sum'} />
       </header>
     </div>
   );

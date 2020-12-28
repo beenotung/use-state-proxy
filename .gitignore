@@ -4,12 +4,14 @@
 /node_modules
 /.pnp
 .pnp.js
+pnpm-lock.yaml
 
 # testing
 /coverage
 
 # production
 /build
+/dist
 
 # misc
 .DS_Store
@@ -17,6 +19,9 @@
 .env.development.local
 .env.test.local
 .env.production.local
+.eslintcache
+.idea/
+*.tgz
 
 npm-debug.log*
 yarn-debug.log*
