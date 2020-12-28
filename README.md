@@ -79,3 +79,6 @@ function Num({ name, state, setState }) {
   </div>
 }
 ```
+
+## License
+[BSD-2-Clause](./LICENSE) (Free Open Source Software)
