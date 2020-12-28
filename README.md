@@ -2,6 +2,8 @@
 
 Using Proxy API to auto dispatch `React.useState()`
 
+[![npm Package Version](https://img.shields.io/npm/v/use-state-proxy?maxAge=3600)](https://www.npmjs.com/package/use-state-proxy)
+
 ## Installation
 
 ```bash
