@@ -1,6 +1,7 @@
 # use-state-proxy
 
-Using Proxy API to auto dispatch `React.useState()`
+Using Proxy API to auto dispatch `React.useState()`.
+Inspired from `@State()` in `@stencil/core`.
 
 [![npm Package Version](https://img.shields.io/npm/v/use-state-proxy?maxAge=3600)](https://www.npmjs.com/package/use-state-proxy)
 
@@ -81,6 +82,15 @@ function Num({ name, state, setState }) {
   </div>
 }
 ```
+
+## Todo
+- [ ] Auto wrap mutating methods of the values
+  - [ ] Array
+  - [ ] Map
+  - [ ] Set
+  - [ ] Date
+  - [ ] Object
+- [ ] Create a variant for shared state, as simpler alternative to redux store (using redux or context)
 
 ## License
 [BSD-2-Clause](./LICENSE) (Free Open Source Software)
