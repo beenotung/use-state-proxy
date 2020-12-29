@@ -91,6 +91,7 @@ function Num({ name, state, setState }) {
   - [ ] Date
   - [ ] Object
 - [ ] Create a variant for shared state, as simpler alternative to redux store (using redux or context)
+- [ ] Refactor to use create-react-library structure?
 
 ## License
 [BSD-2-Clause](./LICENSE) (Free Open Source Software)
