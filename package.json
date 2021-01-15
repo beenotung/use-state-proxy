@@ -18,12 +18,13 @@
     "dist"
   ],
   "scripts": {
+    "preformat": "npm run restore",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
     "prestart": "node scripts/pre-start.js",
     "start": "react-scripts start",
     "restore": "node scripts/restore.js",
     "clean": "rimraf dist",
-    "prebuild": "run-p clean restore",
+    "prebuild": "run-p clean format",
     "build": "tsc -p tsconfig.build.json",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
