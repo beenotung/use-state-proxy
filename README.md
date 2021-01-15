@@ -111,7 +111,7 @@ The same hurdles applies to object as well. And it get worse when it comes to `S
   - [x] Date
   - [x] Object
 - [ ] Create a variant for shared state, as simpler alternative to redux store (using redux or context)
-- [x] Refactor to use create-react-library structure
+- [x] Tested with `@testing-library/jest-dom`
 
 ## License
 [BSD-2-Clause](./LICENSE) (Free Open Source Software)
