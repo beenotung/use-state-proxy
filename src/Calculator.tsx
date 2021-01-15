@@ -1,20 +1,18 @@
 import React from 'react';
-import { State } from './state';
 
-export function Calculator({
-  state,
-  name,
-}: {
-  state: State;
-  name: keyof State;
+export function Calculator(props: {
+  name: string;
+  value: any;
+  onInc?: () => void;
+  onDec?: () => void;
 }) {
   return (
     <div className="Calculator">
-      <b>{name}</b>
+      <b>{props.name}</b>
       <br />
-      <button onClick={() => state[name]--}>-</button>
-      {state[name]}
-      <button onClick={() => state[name]++}>+</button>
+      {props.onDec && <button onClick={props.onDec}>-</button>}
+      {props.value}
+      {props.onInc && <button onClick={props.onInc}>+</button>}
     </div>
   );
 }

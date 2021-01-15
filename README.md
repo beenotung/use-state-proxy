@@ -84,14 +84,14 @@ function Num({ name, state, setState }) {
 ```
 
 ## Todo
-- [ ] Auto wrap mutating methods of the values
-  - [ ] Array
-  - [ ] Map
-  - [ ] Set
-  - [ ] Date
+- [x] Auto trigger re-render when invoking mutating methods on state fields
+  - [x] Array
+  - [x] Map
+  - [x] Set
+  - [x] Date
   - [ ] Object
 - [ ] Create a variant for shared state, as simpler alternative to redux store (using redux or context)
-- [ ] Refactor to use create-react-library structure?
+- [x] Refactor to use create-react-library structure
 
 ## License
 [BSD-2-Clause](./LICENSE) (Free Open Source Software)
