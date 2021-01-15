@@ -17,11 +17,9 @@ export function useStateProxy<T extends object>(
 
   let proxy = new Proxy(state, {
     set(target: any, p: PropertyKey, value: any, receiver: any): boolean {
-      if (!Reflect.has(target, p)) {
-        return Reflect.set(target, p, value, receiver);
-      }
+      let result = Reflect.set(target, p, value, receiver);
       update(p, value);
-      return Reflect.set(target, p, value, receiver);
+      return result;
     },
     get(target: T, p: PropertyKey, receiver: any): any {
       let value = Reflect.get(target, p, receiver);
