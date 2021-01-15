@@ -3,6 +3,8 @@ import './App.css';
 import { useStateProxy } from './use-state-proxy';
 import { Item } from './Item';
 import { State } from './state';
+import DemoUseState from './DemoUseState';
+import DemoUseStateProxy from './DemoUseStateProxy';
 
 function last<T>(xs: T[]): T {
   return xs[xs.length - 1];

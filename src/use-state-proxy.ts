@@ -4,9 +4,9 @@ type StateProxy<T extends object> = T;
 let map = new WeakMap<Dispatch<SetStateAction<any>>, StateProxy<any>>();
 
 export function useStateProxy<T extends object>(
-  initialValues: T,
+  initialValue: T,
 ): StateProxy<T> {
-  const [state, dispatch] = useState(initialValues);
+  const [state, dispatch] = useState(initialValue);
   if (map.has(dispatch)) {
     return map.get(dispatch);
   }

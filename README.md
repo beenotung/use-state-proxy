@@ -20,70 +20,92 @@ pnpm install use-state-proxy
 
 ## Typescript Signature
 ```typescript
-type StateProxy<T extends object> = T;
-
-export function useStateProxy<T extends object>(initialValues: T): StateProxy<T>;
+export function useStateProxy<T extends object>(initialValue: T): T;
 ```
 
-## Examples
+## Comparison
 
 ### With use-state-proxy
-You can get/set the values directly.
-The set state action is auto dispatched if the value is changed, which auto trigger re-rendering when needed.
+You can get/set the values, and call mutating methods (e.g. `array.push()`) directly.
+
+The 'setState' action is auto dispatched when the value is changed, which auto trigger re-rendering.
+
+**Usage Example**:
 ```typescript jsx
-import React from 'react';
-import { useStateProxy } from 'use-state-proxy';
+import React from 'react'
+import { useStateProxy } from 'use-state-proxy'
 
-function App() {
-  let state = useStateProxy({ a: 2, b: 3, sum: 5 })
-  state.sum = state.a + state.b // will not cause deadloop if the new values === existing value
-  return <div>
-    <Num name='a' state={state}/>
-    <Num name='b' state={state}/>
-    <Num name='sum' state={state}/>
-  </div>
+function DemoUseStateProxy() {
+  let state = useStateProxy({
+    text: '',
+    list: ['init']
+  })
+  return <>
+    <input
+      value={state.text}
+      onChange={e => state.text = e.target.value}
+    />
+    <button onClick={() => [state.list.push(state.text), state.text = '']}>
+      Save
+    </button>
+    <ul>
+      {state.list.map((item, i) => <li>
+        <button onClick={() => state.list.splice(i, 1)}>Delete</button>
+        <span>{item}</span>
+      </li>)}
+    </ul>
+  </>
 }
 
-function Num({ state, name }) {
-  return <div>
-    <b>{name}</b>
-    <br/>
-    <button onClick={()=>state[name]--}>Dec</button>
-    {state[name]}
-    <button onClick={()=>state[name]++}>Dec</button>
-  </div>
-}
+export default DemoUseStateProxy
 ```
+
+Using `useStateProxy()`, the array can be updated with `state.list.push(state.text)` and `state.list.splice(i, 1)` directly.
+This invokes proxied methods, and it will auto trigger re-rendering.
 
 ### Without use-state-proxy
-You need to explicitly call the setHook to dispatch update action to trigger re-rendering.
+You need to set up the states one-by-one, and explicitly call the setHooks to trigger re-rendering.
+
+Moreover, there is syntax noise when updating complex data type, e.g. Array, Map, Set, and Object.
+
 ```typescript jsx
-import React from 'react';
+import React, { useState } from 'react'
 
-function App() {
-  let [a, setA] = React.useState(2)
-  let [b, setB] = React.useState(3)
-  let [sum, setSum] = React.useState(a + b)
-  React.useEffect(() => setSum(a + b), [a, b])
-  return <div>
-    <Num name='a' state={a} setState={setA}/>
-    <Num name='b' state={b} setState={setB}/>
-    <Num name='sum' state={sum} setState={setB}/>
-  </div>
+function DemoUseState() {
+  let [text, setText] = useState('')
+  let [list, setList] = useState(['init'])
+  return <>
+    <input value={text} onChange={e => setText(e.target.value)} />
+    <button onClick={() => [setList([...list, text]), setText('')]}>
+      Save
+    </button>
+    <ul>
+      {list.map((item, i) => (
+        <li>
+          <button onClick={() => setList(list.filter((_, j) => i !== j))}>
+            Delete
+          </button>
+          <span>{item}</span>
+        </li>
+      ))}
+    </ul>
+  </>
 }
 
-function Num({ name, state, setState }) {
-  return <div>
-    <b>{name}</b>
-    <br/>
-    <button onClick={()=>setState(state - 1)}>Dec</button>
-    {state}
-    <button onClick={()=>setState(state + 1)}>Inc</button>
-  </div>
-}
+export default DemoUseState
 ```
 
-## Todo
+In this example, in order to 'push' an item to the list, it manually destructs the original array with spread syntax `...` then append the new item at the end.
+
+Also, to remove an item from the list, it constructs a new array with `list.filter()`, involving multiple levels of array indices, which is error-prone.
+
+The same hurdles applies to object as well. And it get worse when it comes to `Set`* and `Map`**.
+
+*: To update a `Set`, we can run `setList(new Set([...list, item]))`
+
+**: To update a `Map`, we can run `setList(new Map([...list, [key, value]]))`
+
+## Features
 - [x] Auto trigger re-render when invoking mutating methods on state fields
   - [x] Array
   - [x] Map
