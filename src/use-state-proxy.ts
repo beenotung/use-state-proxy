@@ -1,14 +1,14 @@
 import { Dispatch, SetStateAction, useState } from 'react';
 
 type StateProxy<T extends object> = T;
-let map = new WeakMap<Dispatch<SetStateAction<any>>, StateProxy<any>>();
+let proxyMap = new WeakMap<Dispatch<SetStateAction<any>>, StateProxy<any>>();
 
 export function useStateProxy<T extends object>(
   initialValue: T,
 ): StateProxy<T> {
   const [state, dispatch] = useState(initialValue);
-  if (map.has(dispatch)) {
-    return map.get(dispatch);
+  if (proxyMap.has(dispatch)) {
+    return proxyMap.get(dispatch);
   }
 
   function update(p: PropertyKey, value: any) {
@@ -39,12 +39,14 @@ export function useStateProxy<T extends object>(
         return wrapMutableMethods(value, mutableDateMethods, () =>
           update(p, value),
         );
+      } else if (Object.prototype.toString.apply(value) === '[object Object]') {
+        return wrapMutableObject(value, () => update(p, value));
       } else {
         return value;
       }
     },
   });
-  map.set(dispatch, proxy);
+  proxyMap.set(dispatch, proxy);
   return proxy;
 }
 
@@ -86,23 +88,34 @@ const mutableDateMethods: Array<keyof typeof Date.prototype> = [
   'setTime',
 ];
 
+let proxySet = new WeakSet();
+
 function wrapMutableMethods<T extends object>(
   o: T,
   methods: Array<keyof T>,
   update: () => void,
 ) {
-  let names = new Set(methods);
+  if (proxySet.has(o)) {
+    return o;
+  }
+  proxySet.add(o);
+  for (let method of methods) {
+    let fn: Function = o[method] as any;
+    o[method] = function () {
+      let result = fn.apply(o, arguments);
+      update();
+      return result;
+    } as any;
+  }
+  return o;
+}
+
+function wrapMutableObject<T extends object>(o: T, update: () => void) {
   return new Proxy(o, {
-    get(target: T, p: PropertyKey, receiver: any): any {
-      let fn = Reflect.get(target, p, receiver);
-      if (!names.has(p as any)) {
-        return fn;
-      }
-      return function () {
-        let result = fn.apply(o, arguments);
-        update();
-        return result;
-      };
+    set(target: T, p: PropertyKey, value: any, receiver: any): boolean {
+      let result = Reflect.set(target, p, value, receiver);
+      update();
+      return result;
     },
   });
 }

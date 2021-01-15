@@ -109,7 +109,7 @@ The same hurdles applies to object as well. And it get worse when it comes to `S
   - [x] Map
   - [x] Set
   - [x] Date
-  - [ ] Object
+  - [x] Object
 - [ ] Create a variant for shared state, as simpler alternative to redux store (using redux or context)
 - [x] Refactor to use create-react-library structure
 

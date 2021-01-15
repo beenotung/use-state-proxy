@@ -20,7 +20,8 @@ test('it should have control buttons', () => {
 test('it should show item from state', () => {
   expect(screen.getByText('2')).toBeInTheDocument();
   expect(screen.getByText('3')).toBeInTheDocument();
-  expect(screen.getAllByText('5')).toHaveLength(2);
+  // expect to appear 4 times: sum, history, set, map
+  expect(screen.getAllByText('5')).toHaveLength(4);
 });
 
 test('it should be able to update', () => {
@@ -41,9 +42,11 @@ test('it should detect changes caused from array method', () => {
 
   let shiftButton = screen.getByText('Shift');
 
-  expect(screen.getByText('5, 6, 7')).toBeInTheDocument();
+  // expect the appear 3 times: history, set, map
+  expect(screen.getAllByText('5, 6, 7')).toHaveLength(3);
   shiftButton.click();
-  expect(screen.getByText('6, 7')).toBeInTheDocument();
+  expect(screen.getAllByText('6, 7')).toHaveLength(3);
   shiftButton.click();
-  expect(screen.getAllByText('7')).toHaveLength(2);
+  expect(screen.getAllByText('7')).toHaveLength(4);
+  shiftButton.click();
 });
