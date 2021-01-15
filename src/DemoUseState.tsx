@@ -12,7 +12,7 @@ function DemoUseState() {
       </button>
       <ul>
         {list.map((item, i) => (
-          <li>
+          <li key={i}>
             <button onClick={() => setList(list.filter((_, j) => i !== j))}>
               Delete
             </button>

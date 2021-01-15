@@ -49,7 +49,7 @@ function DemoUseStateProxy() {
       Save
     </button>
     <ul>
-      {state.list.map((item, i) => <li>
+      {state.list.map((item, i) => <li key={i}>
         <button onClick={() => state.list.splice(i, 1)}>Delete</button>
         <span>{item}</span>
       </li>)}
@@ -80,14 +80,12 @@ function DemoUseState() {
       Save
     </button>
     <ul>
-      {list.map((item, i) => (
-        <li>
-          <button onClick={() => setList(list.filter((_, j) => i !== j))}>
-            Delete
-          </button>
-          <span>{item}</span>
-        </li>
-      ))}
+      {list.map((item, i) => <li key={i}>
+        <button onClick={() => setList(list.filter((_, j) => i !== j))}>
+          Delete
+        </button>
+        <span>{item}</span>
+      </li>)}
     </ul>
   </>
 }

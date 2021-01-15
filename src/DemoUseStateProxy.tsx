@@ -18,7 +18,7 @@ function DemoUseStateProxy() {
       </button>
       <ul>
         {state.list.map((item, i) => (
-          <li>
+          <li key={i}>
             <button onClick={() => state.list.splice(i, 1)}>Delete</button>
             <span>{item}</span>
           </li>
