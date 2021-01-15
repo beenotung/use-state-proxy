@@ -1,13 +1,13 @@
 import React from 'react';
 
-export function Calculator(props: {
+export function Item(props: {
   name: string;
   value: any;
   onInc?: () => void;
   onDec?: () => void;
 }) {
   return (
-    <div className="Calculator">
+    <div className="Item">
       <b>{props.name}</b>
       <br />
       {props.onDec && <button onClick={props.onDec}>-</button>}
