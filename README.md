@@ -23,6 +23,17 @@ pnpm install use-state-proxy
 export function useStateProxy<T extends object>(initialValue: T): T;
 ```
 
+## Features
+- [x] Auto trigger re-render when invoking mutating methods on state fields
+  - [x] Array
+  - [x] Map
+  - [x] Set
+  - [x] Date
+  - [x] Object
+  - [X] Custom Classes
+- [ ] Create a variant for shared state, as simpler alternative to redux store (using redux or context)
+- [x] Tested with `@testing-library/jest-dom`
+
 ## Comparison
 
 ### With use-state-proxy
@@ -97,21 +108,41 @@ In this example, in order to 'push' an item to the list, it manually destructs t
 
 Also, to remove an item from the list, it constructs a new array with `list.filter()`, involving multiple levels of array indices, which is error-prone.
 
-The same hurdles applies to object as well. And it get worse when it comes to `Set`* and `Map`**.
+The same hurdles applies to object as well, and it gets even worse when it comes to `Set`* and `Map`**.
 
-*: To update a `Set`, we can run `setList(new Set([...list, item]))`
+*: To update a `Set`, we can run `setList(new Set([...list, item]))` or `setList(new Set([...list].filter(x => x !== target)))`
 
-**: To update a `Map`, we can run `setList(new Map([...list, [key, value]]))`
+**: To update a `Map`, we can run `setList(new Map([...list, [key, value]]))` or `setList(new Map([...list].filter(([key]) => key !== target)))`
 
-## Features
-- [x] Auto trigger re-render when invoking mutating methods on state fields
-  - [x] Array
-  - [x] Map
-  - [x] Set
-  - [x] Date
-  - [x] Object
-- [ ] Create a variant for shared state, as simpler alternative to redux store (using redux or context)
-- [x] Tested with `@testing-library/jest-dom`
+## Register Mutating Methods on Custom Classes
+
+The mutating methods of custom classes can be registered.
+This mechanism allows use-state-proxy to auto trigger re-rendering even when the state consists of non-json values.
+(Array, Map, Set and Date are supported by default.)
+
+Below demo how to register mutating methods on WeakSet with `registerMutableMethodsByClassConstructor()` and `registerMutableMethodsByClassName()`:
+```typescript
+import {
+  registerMutableMethodsByClassConstructor,
+  registerMutableMethodsByClassName
+} from 'use-state-proxy'
+
+let mutableWeakSetMethods: Array<keyof typeof WeakSet.prototype> = [
+  'add',
+  'delete',
+]
+registerMutableMethodsByClassConstructor(WeakSet, methods)
+registerMutableMethodsByClassName('[object WeakSet]', methods) // to support cross-frame objects
+```
+
+You can also use helper functions `getClassName()` and `registerPrimitiveMutableClass()` to avoid typo mistakes.
+```typescript
+import { getClassName, registerPrimitiveMutableClass } from 'use-state-proxy'
+
+registerPrimitiveMutableClass(WeakSet, getClassName(new WeakSet()), ['add', 'delete'])
+```
+
+Details see [demo-custom-mutable-class.ts](./src/demo-custom-mutable-class.ts)
 
 ## License
 [BSD-2-Clause](./LICENSE) (Free Open Source Software)

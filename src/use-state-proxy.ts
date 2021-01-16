@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, useState } from 'react';
 
 type StateProxy<T extends object> = T;
-let proxyMap = new WeakMap<Dispatch<SetStateAction<any>>, StateProxy<any>>();
+const proxyMap = new WeakMap<Dispatch<SetStateAction<any>>, StateProxy<any>>();
 
 export function useStateProxy<T extends object>(
   initialValue: T,
@@ -15,42 +15,87 @@ export function useStateProxy<T extends object>(
     dispatch(Object.assign({}, state, { [p]: value }));
   }
 
-  let proxy = new Proxy(state, {
+  const proxy = new Proxy(state, {
     set(target: any, p: PropertyKey, value: any, receiver: any): boolean {
-      let result = Reflect.set(target, p, value, receiver);
+      const result = Reflect.set(target, p, value, receiver);
       update(p, value);
       return result;
     },
     get(target: T, p: PropertyKey, receiver: any): any {
-      let value = Reflect.get(target, p, receiver);
-      if (Array.isArray(value)) {
-        return wrapMutableMethods(value, mutableArrayMethods, () =>
-          update(p, value),
-        );
-      } else if (value instanceof Set) {
-        return wrapMutableMethods(value, mutableSetMethods, () =>
-          update(p, value),
-        );
-      } else if (value instanceof Map) {
-        return wrapMutableMethods(value, mutableMapMethods, () =>
-          update(p, value),
-        );
-      } else if (value instanceof Date) {
-        return wrapMutableMethods(value, mutableDateMethods, () =>
-          update(p, value),
-        );
-      } else if (Object.prototype.toString.apply(value) === '[object Object]') {
-        return wrapMutableObject(value, () => update(p, value));
-      } else {
-        return value;
-      }
+      const value = Reflect.get(target, p, receiver);
+      return wrapMutableValue(value, () => update(p, value));
     },
   });
   proxyMap.set(dispatch, proxy);
   return proxy;
 }
 
-const mutableArrayMethods: Array<keyof typeof Array.prototype> = [
+interface Constructor<T extends object> {
+  new (...args: any[]): T;
+
+  prototype: T;
+}
+
+const MutableMethodIndex = {
+  Class: 0 as 0,
+  Methods: 1 as 1,
+};
+
+const mutableMethodsByConstructor: Array<
+  [Constructor<any>, PropertyKey[]]
+> = [];
+const mutableMethodsByClassName: Array<[string, PropertyKey[]]> = [];
+
+export function registerMutableMethodsByClassConstructor<T extends object>(
+  constructor: Constructor<T>,
+  methods: Array<keyof T>,
+) {
+  const prev = mutableMethodsByConstructor.find(
+    (mutableMethod) => mutableMethod[MutableMethodIndex.Class] === constructor,
+  );
+  if (prev) {
+    const keys = new Set<PropertyKey>(methods);
+    prev[MutableMethodIndex.Methods].forEach((key) => keys.add(key));
+    prev[MutableMethodIndex.Methods] = Array.from(keys);
+  } else {
+    mutableMethodsByConstructor.push([constructor, methods.slice()]);
+  }
+}
+
+/**
+ * @param className: output of Object.prototype.toString.apply()
+ * @param methods
+ * */
+export function registerMutableMethodsByClassName<T extends object>(
+  className: string,
+  methods: Array<keyof T>,
+) {
+  const prev = mutableMethodsByClassName.find(
+    (mutableMethod) => mutableMethod[MutableMethodIndex.Class] === className,
+  );
+  if (prev) {
+    const keys = new Set<PropertyKey>(methods);
+    prev[MutableMethodIndex.Methods].forEach((key) => keys.add(key));
+    prev[MutableMethodIndex.Methods] = Array.from(keys);
+  } else {
+    mutableMethodsByClassName.push([className, methods.slice()]);
+  }
+}
+
+export function getClassName(o: any): string {
+  return Object.prototype.toString.apply(o);
+}
+
+export function registerPrimitiveMutableClass<T extends object>(
+  constructor: Constructor<T>,
+  className: string,
+  methods: Array<keyof T>,
+) {
+  registerMutableMethodsByClassConstructor(constructor, methods);
+  registerMutableMethodsByClassName(className, methods);
+}
+
+export const mutableArrayMethods: Array<keyof typeof Array.prototype> = [
   'push',
   'pop',
   'shift',
@@ -60,17 +105,23 @@ const mutableArrayMethods: Array<keyof typeof Array.prototype> = [
   'copyWithin',
   'sort',
 ];
-const mutableMapMethods: Array<keyof typeof Map.prototype> = [
+registerPrimitiveMutableClass(Array, getClassName([]), mutableArrayMethods);
+
+export const mutableMapMethods: Array<keyof typeof Map.prototype> = [
   'set',
   'delete',
   'clear',
 ];
-const mutableSetMethods: Array<keyof typeof Set.prototype> = [
+registerPrimitiveMutableClass(Map, getClassName(new Map()), mutableMapMethods);
+
+export const mutableSetMethods: Array<keyof typeof Set.prototype> = [
   'add',
   'delete',
   'clear',
 ];
-const mutableDateMethods: Array<keyof typeof Date.prototype> = [
+registerPrimitiveMutableClass(Set, getClassName(new Set()), mutableSetMethods);
+
+export const mutableDateMethods: Array<keyof typeof Date.prototype> = [
   'setMilliseconds',
   'setUTCMilliseconds',
   'setSeconds',
@@ -87,8 +138,43 @@ const mutableDateMethods: Array<keyof typeof Date.prototype> = [
   'setUTCFullYear',
   'setTime',
 ];
+registerPrimitiveMutableClass(
+  Date,
+  getClassName(new Date()),
+  mutableDateMethods,
+);
 
-let proxySet = new WeakSet();
+const ObjectClassName = getClassName({});
+
+function wrapMutableValue<T>(value: T, update: () => void): T {
+  const mutableMethodByConstructor = mutableMethodsByConstructor.find(
+    (mutableMethod) => value instanceof mutableMethod[MutableMethodIndex.Class],
+  );
+  if (mutableMethodByConstructor) {
+    return wrapMutableMethods(
+      value as any,
+      mutableMethodByConstructor[MutableMethodIndex.Methods],
+      update,
+    );
+  }
+  const className = getClassName(value);
+  const mutableMethodByClassName = mutableMethodsByClassName.find(
+    (mutableMethod) => mutableMethod[MutableMethodIndex.Class] === className,
+  );
+  if (mutableMethodByClassName) {
+    return wrapMutableMethods(
+      value as any,
+      mutableMethodByClassName[MutableMethodIndex.Methods],
+      update,
+    );
+  }
+  if (className === ObjectClassName) {
+    return wrapMutableObject(value as any, update);
+  }
+  return value;
+}
+
+const proxySet = new WeakSet();
 
 function wrapMutableMethods<T extends object>(
   o: T,
@@ -99,21 +185,21 @@ function wrapMutableMethods<T extends object>(
     return o;
   }
   proxySet.add(o);
-  for (let method of methods) {
-    let fn: Function = o[method] as any;
+  methods.forEach((method) => {
+    const fn: Function = o[method] as any;
     o[method] = function () {
-      let result = fn.apply(o, arguments);
+      const result = fn.apply(o, arguments);
       update();
       return result;
     } as any;
-  }
+  });
   return o;
 }
 
 function wrapMutableObject<T extends object>(o: T, update: () => void) {
-  return new Proxy(o, {
+  return new Proxy<T>(o, {
     set(target: T, p: PropertyKey, value: any, receiver: any): boolean {
-      let result = Reflect.set(target, p, value, receiver);
+      const result = Reflect.set(target, p, value, receiver);
       update();
       return result;
     },
