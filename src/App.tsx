@@ -8,7 +8,7 @@ function last<T>(xs: T[]): T {
 }
 
 function App() {
-  let state = useStateProxy({
+  const state = useStateProxy({
     a: 2,
     b: 3,
     sum: 5,
@@ -16,21 +16,22 @@ function App() {
     set: new Set<number>(),
     map: new Map<number, boolean>(),
   });
+  const { history, set, map } = state;
   useMemo(() => {
     state.sum = state.a + state.b;
   }, [state.a, state.b]);
   useMemo(() => {
-    if (state.sum !== last(state.history)) {
-      state.history.push(state.sum);
-      state.set.add(state.sum);
-      state.map.set(state.sum, true);
+    if (state.sum !== last(history)) {
+      history.push(state.sum);
+      set.add(state.sum);
+      map.set(state.sum, true);
     }
-  }, [state.sum, last(state.history)]);
+  }, [state.sum, last(history)]);
 
   function erase() {
-    let val = state.history.shift()!;
-    state.set.delete(val);
-    state.map.delete(val);
+    let val = history.shift()!;
+    set.delete(val);
+    map.delete(val);
   }
 
   return (
@@ -50,11 +51,11 @@ function App() {
         />
         <Item name="sum" value={state.sum} />
         <button onClick={erase}>Shift</button>
-        <Item name="history" value={state.history.join(', ')} />
-        <Item name="set" value={Array.from(state.set).join(', ')} />
+        <Item name="history" value={history.join(', ')} />
+        <Item name="set" value={Array.from(set).join(', ')} />
         <Item
           name="map"
-          value={Array.from(state.map)
+          value={Array.from(map)
             .map(([k, v]) => k)
             .join(', ')}
         />

@@ -47,21 +47,22 @@ import React from 'react'
 import { useStateProxy } from 'use-state-proxy'
 
 function DemoUseStateProxy() {
-  let state = useStateProxy({
+  const state = useStateProxy({
     text: '',
     list: ['init']
   })
+  const { list } = state
   return <>
     <input
       value={state.text}
       onChange={e => state.text = e.target.value}
     />
-    <button onClick={() => [state.list.push(state.text), state.text = '']}>
+    <button onClick={() => [list.push(state.text), state.text = '']}>
       Save
     </button>
     <ul>
-      {state.list.map((item, i) => <li key={i}>
-        <button onClick={() => state.list.splice(i, 1)}>Delete</button>
+      {list.map((item, i) => <li key={i}>
+        <button onClick={() => list.splice(i, 1)}>Delete</button>
         <span>{item}</span>
       </li>)}
     </ul>
@@ -83,8 +84,8 @@ Moreover, there is syntax noise when updating complex data type, e.g. Array, Map
 import React, { useState } from 'react'
 
 function DemoUseState() {
-  let [text, setText] = useState('')
-  let [list, setList] = useState(['init'])
+  const [text, setText] = useState('')
+  const [list, setList] = useState(['init'])
   return <>
     <input value={text} onChange={e => setText(e.target.value)} />
     <button onClick={() => [setList([...list, text]), setText('')]}>
