@@ -20,7 +20,11 @@ pnpm install use-state-proxy
 
 ## Typescript Signature
 ```typescript
-export function useStateProxy<T extends object>(initialValue: T): T;
+type StateProxy<T extends object> = T
+
+export function useStateProxy<T extends object>(initialValue: T): StateProxy<T>
+
+export function unProxy<T extends object>(proxy: StateProxy<T>): T
 ```
 
 ## Features

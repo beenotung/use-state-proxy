@@ -3,6 +3,8 @@ import { Dispatch, SetStateAction, useState } from 'react';
 type StateProxy<T extends object> = T;
 const proxyMap = new WeakMap<Dispatch<SetStateAction<any>>, StateProxy<any>>();
 
+const Target = Symbol('target');
+
 export function useStateProxy<T extends object>(
   initialValue: T,
 ): StateProxy<T> {
@@ -22,12 +24,19 @@ export function useStateProxy<T extends object>(
       return result;
     },
     get(target: T, p: PropertyKey, receiver: any): any {
+      if (p === Target) {
+        return target;
+      }
       const value = Reflect.get(target, p, receiver);
       return wrapMutableValue(value, () => update(p, value));
     },
   });
   proxyMap.set(dispatch, proxy);
   return proxy;
+}
+
+export function unProxy<T extends object>(proxy: StateProxy<T>): T {
+  return Reflect.get(proxy, Target);
 }
 
 interface Constructor<T extends object> {
