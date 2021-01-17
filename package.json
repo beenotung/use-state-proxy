@@ -1,6 +1,6 @@
 {
   "name": "use-state-proxy",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Using Proxy API to auto dispatch React.useState",
   "keywords": [
     "proxy",
