@@ -22,8 +22,10 @@ pnpm install use-state-proxy
 ```typescript
 type StateProxy<T extends object> = T
 
+// auto trigger re-render when in-place update occurs
 export function useStateProxy<T extends object>(initialValue: T): StateProxy<T>
 
+// return the object reference to the initialValue
 export function unProxy<T extends object>(proxy: StateProxy<T>): T
 ```
 

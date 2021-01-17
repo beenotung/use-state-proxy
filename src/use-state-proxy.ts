@@ -5,6 +5,9 @@ const proxyMap = new WeakMap<Dispatch<SetStateAction<any>>, StateProxy<any>>();
 
 const Target = Symbol('target');
 
+/**
+ * @description auto trigger re-render when in-place update occurs
+ * */
 export function useStateProxy<T extends object>(
   initialValue: T,
 ): StateProxy<T> {
@@ -35,6 +38,9 @@ export function useStateProxy<T extends object>(
   return proxy;
 }
 
+/**
+ * @description return the object reference of the initialValue
+ * */
 export function unProxy<T extends object>(proxy: StateProxy<T>): T {
   return Reflect.get(proxy, Target);
 }
