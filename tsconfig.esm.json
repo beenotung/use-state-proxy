@@ -21,7 +21,7 @@
     "declaration": true,
     "sourceMap": true,
     "jsx": "react-jsx",
-    "outDir": "dist-esm"
+    "outDir": "dist/esm"
   },
   "files": [
     "src/use-state-proxy.ts"
