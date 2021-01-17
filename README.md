@@ -151,5 +151,9 @@ registerPrimitiveMutableClass(WeakSet, getClassName(new WeakSet()), ['add', 'del
 
 Details see [demo-custom-mutable-class.ts](./src/demo-custom-mutable-class.ts)
 
+## Todo
+- [ ] Refactor into typical react-library structure
+      https://medium.com/better-programming/build-your-very-own-react-component-library-and-publish-it-to-github-package-registry-192a688a51fd
+
 ## License
 [BSD-2-Clause](./LICENSE) (Free Open Source Software)

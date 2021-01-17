@@ -12,6 +12,7 @@ pnpm-lock.yaml
 # production
 /build
 /dist
+/dist-esm
 
 # misc
 .DS_Store
