@@ -17,6 +17,14 @@ function DemoUseState() {
               Delete
             </button>
             <span>{item}</span>
+            <input
+              value={item}
+              onChange={(e) => {
+                const newList = [...list];
+                newList[i] = e.target.value;
+                setList(newList);
+              }}
+            />
           </li>
         ))}
       </ul>

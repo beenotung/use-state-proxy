@@ -22,6 +22,13 @@ function DemoUseStateProxy() {
           <li key={i}>
             <button onClick={() => list.splice(i, 1)}>Delete</button>
             <span>{item}</span>
+            <input
+              value={item}
+              onChange={(e) => [
+                (state.list[i] = e.target.value),
+                (state.list = state.list),
+              ]}
+            />
           </li>
         ))}
       </ul>

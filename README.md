@@ -70,6 +70,13 @@ function DemoUseStateProxy() {
       {list.map((item, i) => <li key={i}>
         <button onClick={() => list.splice(i, 1)}>Delete</button>
         <span>{item}</span>
+        <input
+          value={item}
+          onChange={(e) => [
+            (state.list[i] = e.target.value),
+            (state.list = state.list),
+          ]}
+        />
       </li>)}
     </ul>
   </>
@@ -103,6 +110,14 @@ function DemoUseState() {
           Delete
         </button>
         <span>{item}</span>
+        <input
+          value={item}
+          onChange={(e) => {
+            const newList = [...list];
+            newList[i] = e.target.value;
+            setList(newList);
+          }}
+        />
       </li>)}
     </ul>
   </>
