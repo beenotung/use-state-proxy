@@ -5,13 +5,16 @@ const proxyMap = new WeakMap<Dispatch<SetStateAction<any>>, StateProxy<any>>();
 
 const Target = Symbol('target');
 
+export type UseState<T> = (initialValue: T) => [T, (newValue: T) => void];
+
 /**
  * @description auto trigger re-render when in-place update occurs
  * */
 export function useStateProxy<T extends object>(
   initialValue: T,
+  _useState: UseState<T> = useState,
 ): StateProxy<T> {
-  const [state, dispatch] = useState(initialValue);
+  const [state, dispatch] = _useState(initialValue);
   if (proxyMap.has(dispatch)) {
     return proxyMap.get(dispatch);
   }
