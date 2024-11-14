@@ -63,7 +63,7 @@ function DemoUseStateProxy() {
       value={state.text}
       onChange={e => state.text = e.target.value}
     />
-    <button onClick={() => [list.push(state.text), state.text = '']}>
+    <button onClick={() => {list.push(state.text); state.text = ''}}>
       Save
     </button>
     <ul>
@@ -72,10 +72,10 @@ function DemoUseStateProxy() {
         <span>{item}</span>
         <input
           value={item}
-          onChange={(e) => [
-            (state.list[i] = e.target.value),
-            (state.list = state.list),
-          ]}
+          onChange={(e) => {
+            state.list[i] = e.target.value
+            state.list = state.list
+          }}
         />
       </li>)}
     </ul>
@@ -101,7 +101,7 @@ function DemoUseState() {
   const [list, setList] = useState(['init'])
   return <>
     <input value={text} onChange={e => setText(e.target.value)} />
-    <button onClick={() => [setList([...list, text]), setText('')]}>
+    <button onClick={() => {setList([...list, text]); setText('')}}>
       Save
     </button>
     <ul>
