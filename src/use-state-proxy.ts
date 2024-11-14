@@ -59,9 +59,8 @@ const MutableMethodIndex = {
   Methods: 1 as 1,
 };
 
-const mutableMethodsByConstructor: Array<
-  [Constructor<any>, PropertyKey[]]
-> = [];
+const mutableMethodsByConstructor: Array<[Constructor<any>, PropertyKey[]]> =
+  [];
 const mutableMethodsByClassName: Array<[string, PropertyKey[]]> = [];
 
 export function registerMutableMethodsByClassConstructor<T extends object>(

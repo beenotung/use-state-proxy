@@ -14,7 +14,12 @@ function DemoUseStateProxy() {
         value={state.text}
         onChange={(e) => (state.text = e.target.value)}
       />
-      <button onClick={() => {list.push(state.text); state.text = ''}}>
+      <button
+        onClick={() => {
+          list.push(state.text);
+          state.text = '';
+        }}
+      >
         Save
       </button>
       <ul>

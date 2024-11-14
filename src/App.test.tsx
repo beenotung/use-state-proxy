@@ -31,7 +31,7 @@ test('it should be able to update', () => {
   act(() => {
     plusElements[0].click();
     plusElements[1].click();
-  })
+  });
 
   expect(screen.getByText('3')).toBeInTheDocument();
   expect(screen.getByText('4')).toBeInTheDocument();
@@ -43,11 +43,11 @@ test('it should detect changes caused from array method', () => {
 
   act(() => {
     plusElements[0].click();
-  })
+  });
 
   act(() => {
     plusElements[1].click();
-  })
+  });
 
   let shiftButton = screen.getByText('Shift');
 
@@ -55,13 +55,13 @@ test('it should detect changes caused from array method', () => {
   expect(screen.getAllByText('5, 6, 7')).toHaveLength(3);
   act(() => {
     shiftButton.click();
-  })
+  });
   expect(screen.getAllByText('6, 7')).toHaveLength(3);
   act(() => {
     shiftButton.click();
-  })
+  });
   expect(screen.getAllByText('7')).toHaveLength(4);
   act(() => {
     shiftButton.click();
-  })
+  });
 });

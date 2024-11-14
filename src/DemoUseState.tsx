@@ -7,7 +7,12 @@ function DemoUseState() {
   return (
     <>
       <input value={text} onChange={(e) => setText(e.target.value)} />
-      <button onClick={() => {setList([...list, text]); setText('')}}>
+      <button
+        onClick={() => {
+          setList([...list, text]);
+          setText('');
+        }}
+      >
         Save
       </button>
       <ul>
