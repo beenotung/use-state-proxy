@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { act } from 'react';
 import { render, screen } from '@testing-library/react';
 import App from './App';
 
@@ -27,8 +27,11 @@ test('it should show item from state', () => {
 test('it should be able to update', () => {
   let plusElements = screen.getAllByText('+');
   expect(plusElements).toHaveLength(2);
-  plusElements[0].click();
-  plusElements[1].click();
+
+  act(() => {
+    plusElements[0].click();
+    plusElements[1].click();
+  })
 
   expect(screen.getByText('3')).toBeInTheDocument();
   expect(screen.getByText('4')).toBeInTheDocument();
@@ -37,16 +40,28 @@ test('it should be able to update', () => {
 
 test('it should detect changes caused from array method', () => {
   let plusElements = screen.getAllByText('+');
-  plusElements[0].click();
-  plusElements[1].click();
+
+  act(() => {
+    plusElements[0].click();
+  })
+
+  act(() => {
+    plusElements[1].click();
+  })
 
   let shiftButton = screen.getByText('Shift');
 
   // expect the appear 3 times: history, set, map
   expect(screen.getAllByText('5, 6, 7')).toHaveLength(3);
-  shiftButton.click();
+  act(() => {
+    shiftButton.click();
+  })
   expect(screen.getAllByText('6, 7')).toHaveLength(3);
-  shiftButton.click();
+  act(() => {
+    shiftButton.click();
+  })
   expect(screen.getAllByText('7')).toHaveLength(4);
-  shiftButton.click();
+  act(() => {
+    shiftButton.click();
+  })
 });
