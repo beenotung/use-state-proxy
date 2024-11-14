@@ -45,7 +45,7 @@ export function useStateProxy<T extends object>(
  * @description return the object reference of the initialValue
  * */
 export function unProxy<T extends object>(proxy: StateProxy<T>): T {
-  return Reflect.get(proxy, Target);
+  return Reflect.get(proxy, Target) as T;
 }
 
 interface Constructor<T extends object> {
