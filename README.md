@@ -19,6 +19,7 @@ pnpm install use-state-proxy
 ```
 
 ## Typescript Signature
+
 ```typescript
 type StateProxy<T extends object> = T
 
@@ -30,24 +31,27 @@ export function unProxy<T extends object>(proxy: StateProxy<T>): T
 ```
 
 ## Features
+
 - [x] Auto trigger re-render when invoking mutating methods on state fields
   - [x] Array
   - [x] Map
   - [x] Set
   - [x] Date
   - [x] Object
-  - [X] Custom Classes
+  - [x] Custom Classes
 - [ ] Create a variant for shared state, as simpler alternative to redux store (using redux or context)
 - [x] Tested with `@testing-library/jest-dom`
 
 ## Comparison
 
 ### With use-state-proxy
+
 You can get/set the values, and call mutating methods (e.g. `array.push()`) directly.
 
 The 'setState' action is auto dispatched when the value is changed, which auto trigger re-rendering.
 
 **Usage Example**:
+
 ```typescript jsx
 import React from 'react'
 import { useStateProxy } from 'use-state-proxy'
@@ -55,34 +59,37 @@ import { useStateProxy } from 'use-state-proxy'
 function DemoUseStateProxy() {
   const state = useStateProxy({
     text: '',
-    list: ['init']
+    list: ['init'],
   })
   const { list } = state
-  return <>
-    <input
-      value={state.text}
-      onChange={e => state.text = e.target.value}
-    />
-    <button onClick={() => {
-      list.push(state.text);
-      state.text = '';
-    }}>
-      Save
-    </button>
-    <ul>
-      {list.map((item, i) => <li key={i}>
-        <button onClick={() => list.splice(i, 1)}>Delete</button>
-        <span>{item}</span>
-        <input
-          value={item}
-          onChange={(e) => {
-            state.list[i] = e.target.value
-            state.list = state.list
-          }}
-        />
-      </li>)}
-    </ul>
-  </>
+  return (
+    <>
+      <input value={state.text} onChange={e => (state.text = e.target.value)} />
+      <button
+        onClick={() => {
+          list.push(state.text)
+          state.text = ''
+        }}
+      >
+        Save
+      </button>
+      <ul>
+        {list.map((item, i) => (
+          <li key={i}>
+            <button onClick={() => list.splice(i, 1)}>Delete</button>
+            <span>{item}</span>
+            <input
+              value={item}
+              onChange={e => {
+                state.list[i] = e.target.value
+                state.list = state.list
+              }}
+            />
+          </li>
+        ))}
+      </ul>
+    </>
+  )
 }
 
 export default DemoUseStateProxy
@@ -92,6 +99,7 @@ Using `useStateProxy()`, the array can be updated with `state.list.push(state.te
 This invokes proxied methods, and it will auto trigger re-rendering.
 
 ### Without use-state-proxy
+
 You need to set up the states one-by-one, and explicitly call the setHooks to trigger re-rendering.
 
 Moreover, there is syntax noise when updating complex data type, e.g. Array, Map, Set, and Object.
@@ -102,33 +110,37 @@ import React, { useState } from 'react'
 function DemoUseState() {
   const [text, setText] = useState('')
   const [list, setList] = useState(['init'])
-  return <>
-    <input value={text} onChange={e => setText(e.target.value)} />
-    <button
-      onClick={() => {
-        setList([...list, text]);
-        setText('');
-      }}
-    >
-      Save
-    </button>
-    <ul>
-      {list.map((item, i) => <li key={i}>
-        <button onClick={() => setList(list.filter((_, j) => i !== j))}>
-          Delete
-        </button>
-        <span>{item}</span>
-        <input
-          value={item}
-          onChange={(e) => {
-            const newList = [...list];
-            newList[i] = e.target.value;
-            setList(newList);
-          }}
-        />
-      </li>)}
-    </ul>
-  </>
+  return (
+    <>
+      <input value={text} onChange={e => setText(e.target.value)} />
+      <button
+        onClick={() => {
+          setList([...list, text])
+          setText('')
+        }}
+      >
+        Save
+      </button>
+      <ul>
+        {list.map((item, i) => (
+          <li key={i}>
+            <button onClick={() => setList(list.filter((_, j) => i !== j))}>
+              Delete
+            </button>
+            <span>{item}</span>
+            <input
+              value={item}
+              onChange={e => {
+                const newList = [...list]
+                newList[i] = e.target.value
+                setList(newList)
+              }}
+            />
+          </li>
+        ))}
+      </ul>
+    </>
+  )
 }
 
 export default DemoUseState
@@ -138,11 +150,11 @@ In this example, in order to 'push' an item to the list, it manually destructs t
 
 Also, to remove an item from the list, it constructs a new array with `list.filter()`, involving multiple levels of array indices, which is error-prone.
 
-The same hurdles applies to object as well, and it gets even worse when it comes to `Set`* and `Map`**.
+The same hurdles applies to object as well, and it gets even worse when it comes to `Set`\* and `Map`\*\*.
 
-*: To update a `Set`, we can run `setList(new Set([...list, item]))` or `setList(new Set([...list].filter(x => x !== target)))`
+\*: To update a `Set`, we can run `setList(new Set([...list, item]))` or `setList(new Set([...list].filter(x => x !== target)))`
 
-**: To update a `Map`, we can run `setList(new Map([...list, [key, value]]))` or `setList(new Map([...list].filter(([key]) => key !== target)))`
+\*\*: To update a `Map`, we can run `setList(new Map([...list, [key, value]]))` or `setList(new Map([...list].filter(([key]) => key !== target)))`
 
 ## Register Mutating Methods on Custom Classes
 
@@ -151,10 +163,11 @@ This mechanism allows use-state-proxy to auto trigger re-rendering even when the
 (Array, Map, Set and Date are supported by default.)
 
 Below demo how to register mutating methods on WeakSet with `registerMutableMethodsByClassConstructor()` and `registerMutableMethodsByClassName()`:
+
 ```typescript
 import {
   registerMutableMethodsByClassConstructor,
-  registerMutableMethodsByClassName
+  registerMutableMethodsByClassName,
 } from 'use-state-proxy'
 
 let mutableWeakSetMethods: Array<keyof typeof WeakSet.prototype> = [
@@ -166,17 +179,23 @@ registerMutableMethodsByClassName('[object WeakSet]', methods) // to support cro
 ```
 
 You can also use helper functions `getClassName()` and `registerPrimitiveMutableClass()` to avoid typo mistakes.
+
 ```typescript
 import { getClassName, registerPrimitiveMutableClass } from 'use-state-proxy'
 
-registerPrimitiveMutableClass(WeakSet, getClassName(new WeakSet()), ['add', 'delete'])
+registerPrimitiveMutableClass(WeakSet, getClassName(new WeakSet()), [
+  'add',
+  'delete',
+])
 ```
 
 Details see [demo-custom-mutable-class.ts](./src/demo-custom-mutable-class.ts)
 
 ## Todo
+
 - [ ] Refactor into typical react-library structure
       https://medium.com/better-programming/build-your-very-own-react-component-library-and-publish-it-to-github-package-registry-192a688a51fd
 
 ## License
+
 [BSD-2-Clause](./LICENSE) (Free Open Source Software)
